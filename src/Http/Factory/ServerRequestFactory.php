@@ -20,8 +20,8 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
     public function createServerRequestFromArray(array $server): ServerRequestInterface
     {
         return new ServerRequest(
-            $this->getMethodFromEnvironment($server),
-            $this->getUriFromEnvironmentWithHTTP($server),
+            static::getMethodFromEnvironment($server),
+            static::getUriFromEnvironmentWithHTTP($server),
             [],
             null,
             '1.1',
@@ -29,7 +29,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         );
     }
 
-    public function createServerRequestFromArrays(
+    public static function createServerRequestFromArrays(
         array $server,
         array $headers,
         array $cookie,
@@ -38,8 +38,8 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         array $files
     ): ServerRequestInterface
     {
-        $method = $this->getMethodFromEnvironment($server);
-        $uri    = $this->getUriFromEnvironmentWithHTTP($server);
+        $method = static::getMethodFromEnvironment($server);
+        $uri    = static::getUriFromEnvironmentWithHTTP($server);
 
         $protocol = str_replace('HTTP/', '', $server['SERVER_PROTOCOL'] ?? '1.1');
 
@@ -52,7 +52,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
             ->withUploadedFiles(self::normalizeFiles($files));
     }
 
-    public function createServerRequestFromGlobals(): ServerRequestInterface
+    public static function createServerRequestFromGlobals(): ServerRequestInterface
     {
         $server = filter_input_array(INPUT_SERVER, FILTER_UNSAFE_RAW) ?: [];
 
@@ -61,16 +61,21 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
             $server['REQUEST_METHOD'] = 'GET';
         }
 
-        $headers = getallheaders();
+        $headers = [];
+
+        if (function_exists('getallheaders'))
+        {
+            $headers = getallheaders();
+        }
 
         $cookie = filter_input_array(INPUT_COOKIE, FILTER_UNSAFE_RAW) ?: [];
         $query = filter_input_array(INPUT_GET, FILTER_UNSAFE_RAW) ?: [];
         $data = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?: [];
 
-        return $this->createServerRequestFromArrays($server, $headers, $cookie, $query, $data, $_FILES);
+        return static::createServerRequestFromArrays($server, $headers, $cookie, $query, $data, $_FILES);
     }
 
-    private function getMethodFromEnvironment(array $environment): string
+    private static function getMethodFromEnvironment(array $environment): string
     {
         if (false === isset($environment['REQUEST_METHOD']))
         {
@@ -80,7 +85,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         return $environment['REQUEST_METHOD'];
     }
 
-    private function getUriFromEnvironmentWithHTTP(array $environment): \Psr\Http\Message\UriInterface
+    private static function getUriFromEnvironmentWithHTTP(array $environment): \Psr\Http\Message\UriInterface
     {
         $uri = (new UriFactory())
             ->createUriFromArray($environment);

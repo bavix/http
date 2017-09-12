@@ -56,8 +56,9 @@ class UriFactory implements \Http\Message\UriFactory, UriFactoryInterface
 
         if (isset($server['REQUEST_URI']))
         {
-            $uri  = $server['REQUEST_URI'];
-            $data = explode('?', $uri);
+            $reqUri  = $server['REQUEST_URI'];
+            $data = explode('?', $reqUri);
+
             $uri  = $uri->withPath(current($data));
         }
 
