@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Bavix\Http\Factory;
 
 use Interop\Http\Factory\UriFactoryInterface;
