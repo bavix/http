@@ -155,7 +155,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function getAttribute($attribute, $default = null)
     {
-        if (false === array_key_exists($attribute, $this->attributes))
+        if (false === array_key_exists($attribute, $this->getAttributes()))
         {
             return $default;
         }
@@ -173,7 +173,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function withoutAttribute($attribute)
     {
-        if (false === array_key_exists($attribute, $this->attributes))
+        if (false === array_key_exists($attribute, $this->getAttributes()))
         {
             return $this;
         }
