@@ -2,6 +2,7 @@
 
 namespace Bavix\Http;
 
+use Bavix\Router\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -40,6 +41,16 @@ class ServerRequest extends Request implements ServerRequestInterface
     protected $uploadedFiles = [];
 
     /**
+     * @var bool
+     */
+    protected $routerLoadAttributes;
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
      * @param string                               $method       HTTP method
      * @param string|UriInterface                  $uri          URI
      * @param array                                $headers      Request headers
@@ -59,6 +70,14 @@ class ServerRequest extends Request implements ServerRequestInterface
         $this->serverParams = $serverParams;
 
         parent::__construct($method, $uri, $headers, $body, $version);
+    }
+
+    public function withRouter(Router $router)
+    {
+        $new         = clone $this;
+        $new->router = $router;
+
+        return $new;
     }
 
     public function getServerParams()
@@ -120,6 +139,17 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function getAttributes()
     {
+        if ($this->router && !$this->routerLoadAttributes)
+        {
+            $this->attributes = \array_merge(
+                $this->attributes,
+                $this->router->getCurrentRoute()
+                    ->getAttributes()
+            );
+
+            $this->routerLoadAttributes = true;
+        }
+
         return $this->attributes;
     }
 
