@@ -141,10 +141,15 @@ class ServerRequest extends Request implements ServerRequestInterface
     {
         if ($this->router && !$this->routerLoadAttributes)
         {
+            $route = $this->router->getRoute(
+                $this->getUri()->getPath(),
+                $this->getUri()->getHost(),
+                $this->getUri()->getScheme()
+            );
+
             $this->attributes = \array_merge(
                 $this->attributes,
-                $this->router->getCurrentRoute()
-                    ->getAttributes()
+                $route->getAttributes()
             );
 
             $this->routerLoadAttributes = true;
