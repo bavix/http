@@ -77,7 +77,15 @@ class ServerRequest extends Request implements ServerRequestInterface
 
         parent::__construct($method, $uri, $headers, $body, $version);
     }
-    
+
+    /**
+     * @return Cookies|null
+     */
+    public function cookies()
+    {
+        return $this->cookies;
+    }
+
     public function setCookies(Cookies $cookies)
     {
         $this->cookies = $cookies;
