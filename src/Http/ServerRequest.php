@@ -139,7 +139,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function getAttributes()
     {
-        if ($this->router && !$this->routerLoadAttributes)
+        if ($this->router instanceof Router && !$this->routerLoadAttributes)
         {
             $route = $this->router->getRoute(
                 $this->getUri()->getPath(),
