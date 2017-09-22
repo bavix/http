@@ -2,7 +2,6 @@
 
 namespace Bavix\Http;
 
-use Bavix\Context\Cookies;
 use Bavix\Router\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
@@ -52,11 +51,6 @@ class ServerRequest extends Request implements ServerRequestInterface
     protected $router;
 
     /**
-     * @var Cookies
-     */
-    protected $cookies;
-
-    /**
      * @param string                               $method       HTTP method
      * @param string|UriInterface                  $uri          URI
      * @param array                                $headers      Request headers
@@ -76,21 +70,6 @@ class ServerRequest extends Request implements ServerRequestInterface
         $this->serverParams = $serverParams;
 
         parent::__construct($method, $uri, $headers, $body, $version);
-    }
-
-    /**
-     * @return Cookies|null
-     */
-    public function cookies()
-    {
-        return $this->cookies;
-    }
-
-    public function setCookies(Cookies $cookies)
-    {
-        $this->cookies = $cookies;
-
-        return $this;
     }
 
     public function withRouter(Router $router)
