@@ -26,7 +26,7 @@ class Uri implements UriInterface
     {
         if ($uri !== '')
         {
-            $parts = parse_url($uri);
+            $parts = \parse_url($uri);
 
             if ($parts === false)
             {
@@ -259,7 +259,7 @@ class Uri implements UriInterface
             {
                 if ($authority === '')
                 {
-                    $path = '/' . ltrim($path, '/');
+                    $path = '/' . \ltrim($path, '/');
                 }
             }
 
@@ -286,12 +286,12 @@ class Uri implements UriInterface
 
     protected function filterScheme(string $scheme): string
     {
-        return strtolower($scheme);
+        return \strtolower($scheme);
     }
 
     protected function filterHost(string $host): string
     {
-        return strtolower($host);
+        return \strtolower($host);
     }
 
     protected function filterPort(?int $port)
@@ -311,7 +311,7 @@ class Uri implements UriInterface
 
     protected function filterPath(string $path): string
     {
-        return preg_replace_callback(
+        return \preg_replace_callback(
             '/(?:[^' . self::$charUnreserved . self::$charSubDelims . '%:@\/]++|%(?![A-Fa-f0-9]{2}))/',
             [$this, 'rawUrlEncode'],
             $path
@@ -320,7 +320,7 @@ class Uri implements UriInterface
 
     protected function filterQueryAndFragment(string $str): string
     {
-        return preg_replace_callback(
+        return \preg_replace_callback(
             '/(?:[^' . self::$charUnreserved . self::$charSubDelims . '%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/',
             [$this, 'rawUrlEncode'],
             $str
@@ -329,7 +329,7 @@ class Uri implements UriInterface
 
     protected function rawUrlEncode(array $match): string
     {
-        return rawurlencode($match[0]);
+        return \rawurlencode($match[0]);
     }
 
 }

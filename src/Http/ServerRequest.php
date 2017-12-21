@@ -2,7 +2,10 @@
 
 namespace Bavix\Http;
 
+use Bavix\Context\Cookies;
+use Bavix\Context\Session;
 use Bavix\Router\Router;
+use Bavix\Slice\Slice;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -11,32 +14,42 @@ use Psr\Http\Message\UriInterface;
 class ServerRequest extends Request implements ServerRequestInterface
 {
     /**
-     * @var array
+     * @var Session
      */
-    protected $attributes = [];
+    protected $session;
 
     /**
-     * @var array
+     * @var Cookies
+     */
+    protected $cookies;
+
+    /**
+     * @var Slice
+     */
+    protected $attributes;
+
+    /**
+     * @var Slice
      */
     protected $cookieParams = [];
 
     /**
-     * @var null|array|object
+     * @var Slice
      */
     protected $parsedBody;
 
     /**
-     * @var array
+     * @var Slice
      */
     protected $queryParams = [];
 
     /**
-     * @var array
+     * @var Slice
      */
     protected $serverParams;
 
     /**
-     * @var UploadedFileInterface[]
+     * @var Slice|UploadedFileInterface[]
      */
     protected $uploadedFiles = [];
 
@@ -67,7 +80,8 @@ class ServerRequest extends Request implements ServerRequestInterface
         array $serverParams = []
     )
     {
-        $this->serverParams = $serverParams;
+        $this->attributes   = new Slice([]);
+        $this->serverParams = new Slice($serverParams);
 
         parent::__construct($method, $uri, $headers, $body, $version);
     }
@@ -80,11 +94,17 @@ class ServerRequest extends Request implements ServerRequestInterface
         return $new;
     }
 
+    /**
+     * @return Slice
+     */
     public function getServerParams()
     {
         return $this->serverParams;
     }
 
+    /**
+     * @return Slice|UploadedFileInterface[]
+     */
     public function getUploadedFiles()
     {
         return $this->uploadedFiles;
@@ -93,24 +113,62 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function withUploadedFiles(array $uploadedFiles)
     {
         $new                = clone $this;
-        $new->uploadedFiles = $uploadedFiles;
+        $new->uploadedFiles = new Slice($uploadedFiles);
 
         return $new;
     }
 
+    /**
+     * @return Slice
+     */
     public function getCookieParams()
     {
         return $this->cookieParams;
     }
 
-    public function withCookieParams(array $cookies)
+    /**
+     * @return Cookies
+     */
+    public function cookies()
     {
-        $new               = clone $this;
-        $new->cookieParams = $cookies;
+        return $this->cookies;
+    }
+
+    public function withCookiesContent(Cookies $cookies)
+    {
+        $new          = clone $this;
+        $new->cookies = $cookies;
 
         return $new;
     }
 
+    /**
+     * @return Session
+     */
+    public function session()
+    {
+        return $this->session;
+    }
+
+    public function withSessionContent(Session $session)
+    {
+        $new          = clone $this;
+        $new->session = $session;
+
+        return $new;
+    }
+
+    public function withCookieParams(array $cookies)
+    {
+        $new               = clone $this;
+        $new->cookieParams = new Slice($cookies);
+
+        return $new;
+    }
+
+    /**
+     * @return Slice
+     */
     public function getQueryParams()
     {
         return $this->queryParams;
@@ -119,11 +177,14 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function withQueryParams(array $query)
     {
         $new              = clone $this;
-        $new->queryParams = $query;
+        $new->queryParams = new Slice($query);
 
         return $new;
     }
 
+    /**
+     * @return Slice
+     */
     public function getParsedBody()
     {
         return $this->parsedBody;
@@ -132,11 +193,14 @@ class ServerRequest extends Request implements ServerRequestInterface
     public function withParsedBody($data)
     {
         $new             = clone $this;
-        $new->parsedBody = $data;
+        $new->parsedBody = new Slice($data);
 
         return $new;
     }
 
+    /**
+     * @return Slice
+     */
     public function getAttributes()
     {
         if ($this->router instanceof Router && !$this->routerLoadAttributes)
@@ -147,8 +211,7 @@ class ServerRequest extends Request implements ServerRequestInterface
                 $this->getUri()->getScheme()
             );
 
-            $this->attributes = \array_merge(
-                $this->attributes,
+            $this->attributes->setData(
                 $route->getAttributes()
             );
 
@@ -160,12 +223,8 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function getAttribute($attribute, $default = null)
     {
-        if (false === array_key_exists($attribute, $this->getAttributes()))
-        {
-            return $default;
-        }
-
-        return $this->attributes[$attribute];
+        return $this->getAttributes()
+            ->getData($attribute, $default);
     }
 
     public function withAttribute($attribute, $value)
@@ -178,7 +237,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function withoutAttribute($attribute)
     {
-        if (false === array_key_exists($attribute, $this->getAttributes()))
+        if (!$this->getAttributes()->offsetExists($attribute))
         {
             return $this;
         }

@@ -26,13 +26,13 @@ class UploadedFileFactory implements UploadedFileFactoryInterface
     {
         if ($size === null)
         {
-            if (is_string($file))
+            if (\is_string($file))
             {
                 $size = (int)filesize($file);
             }
             else
             {
-                $stats = fstat($file);
+                $stats = \fstat($file);
                 $size  = $stats['size'];
             }
         }

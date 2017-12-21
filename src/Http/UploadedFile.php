@@ -66,11 +66,11 @@ class UploadedFile implements UploadedFileInterface
 
     protected function setStreamOrFile($streamOrFile)
     {
-        if (is_string($streamOrFile))
+        if (\is_string($streamOrFile))
         {
             $this->file = $streamOrFile;
         }
-        elseif (is_resource($streamOrFile))
+        elseif (\is_resource($streamOrFile))
         {
             $this->stream = Stream::createFromResource($streamOrFile);
         }
@@ -91,7 +91,7 @@ class UploadedFile implements UploadedFileInterface
      */
     protected function setError(int $error)
     {
-        if (false === in_array($error, self::$errors, true))
+        if (false === \in_array($error, self::$errors, true))
         {
             throw new InvalidArgumentException('Invalid error status for UploadedFile');
         }
@@ -162,7 +162,7 @@ class UploadedFile implements UploadedFileInterface
             return $this->stream;
         }
 
-        $resource = fopen($this->file, 'rb');
+        $resource = \fopen($this->file, 'rb');
 
         return Stream::createFromResource($resource);
     }
@@ -179,12 +179,13 @@ class UploadedFile implements UploadedFileInterface
         if (null !== $this->file)
         {
             $this->moved = PHP_SAPI === 'cli'
-                ? rename($this->file, $targetPath)
-                : move_uploaded_file($this->file, $targetPath);
+                ? \rename($this->file, $targetPath)
+                : \move_uploaded_file($this->file, $targetPath);
         }
         else
         {
             $stream = $this->getStream();
+
             if ($stream->isSeekable())
             {
                 $stream->rewind();
@@ -192,7 +193,9 @@ class UploadedFile implements UploadedFileInterface
 
             (new StreamFactory())->copyToStream(
                 $stream,
-                Stream::createFromResource(fopen($targetPath, 'wb'))
+                Stream::createFromResource(
+                    \fopen($targetPath, 'wb')
+                )
             );
 
             $this->moved = true;

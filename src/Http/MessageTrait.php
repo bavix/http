@@ -57,7 +57,7 @@ trait MessageTrait
 
     public function getHeader($header): array
     {
-        $header = strtolower($header);
+        $header = \strtolower($header);
 
         if (!isset($this->headerNames[$header]))
         {
@@ -71,18 +71,18 @@ trait MessageTrait
 
     public function getHeaderLine($header): string
     {
-        return implode(', ', $this->getHeader($header));
+        return \implode(', ', $this->getHeader($header));
     }
 
     public function withHeader($header, $value): self
     {
-        if (!is_array($value))
+        if (!\is_array($value))
         {
             $value = [$value];
         }
 
         $value      = $this->trimHeaderValues($value);
-        $normalized = strtolower($header);
+        $normalized = \strtolower($header);
 
         $new = clone $this;
 
@@ -99,24 +99,24 @@ trait MessageTrait
 
     public function withAddedHeader($header, $value): self
     {
-        if (!is_array($value))
+        if (!\is_array($value))
         {
             $value = [$value];
         }
         else
         {
-            $value = array_values($value);
+            $value = \array_values($value);
         }
 
         $value      = $this->trimHeaderValues($value);
-        $normalized = strtolower($header);
+        $normalized = \strtolower($header);
 
         $new = clone $this;
 
         if (isset($new->headerNames[$normalized]))
         {
             $header                = $this->headerNames[$normalized];
-            $new->headers[$header] = array_merge($this->headers[$header], $value);
+            $new->headers[$header] = \array_merge($this->headers[$header], $value);
         }
         else
         {
@@ -129,7 +129,7 @@ trait MessageTrait
 
     public function withoutHeader($header): self
     {
-        $normalized = strtolower($header);
+        $normalized = \strtolower($header);
 
         if (!isset($this->headerNames[$normalized]))
         {
@@ -176,12 +176,12 @@ trait MessageTrait
             $value = (array)$value;
 
             $value      = $this->trimHeaderValues($value);
-            $normalized = strtolower($header);
+            $normalized = \strtolower($header);
 
             if (isset($this->headerNames[$normalized]))
             {
                 $header                 = $this->headerNames[$normalized];
-                $this->headers[$header] = array_merge($this->headers[$header], $value);
+                $this->headers[$header] = \array_merge($this->headers[$header], $value);
             }
             else
             {
@@ -193,9 +193,9 @@ trait MessageTrait
 
     protected function trimHeaderValues(array $values): array
     {
-        return array_map(function ($value) {
+        return \array_map(function ($value) {
 
-            return trim($value, " \t");
+            return \trim($value, " \t");
 
         }, $values);
     }

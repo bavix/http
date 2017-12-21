@@ -21,7 +21,7 @@ class StreamFactory implements \Http\Message\StreamFactory, StreamFactoryInterfa
             return $body;
         }
 
-        if (is_resource($body))
+        if (\is_resource($body))
         {
             return Stream::createFromResource($body);
         }
@@ -31,7 +31,7 @@ class StreamFactory implements \Http\Message\StreamFactory, StreamFactoryInterfa
 
     public function createStreamFromFile($file, $mode = 'rb')
     {
-        $resource = fopen($file, $mode);
+        $resource = \fopen($file, $mode);
 
         return Stream::createFromResource($resource);
     }
@@ -75,7 +75,7 @@ class StreamFactory implements \Http\Message\StreamFactory, StreamFactoryInterfa
         {
             $buf = $source->read($maxLen - $bytes);
 
-            if (!($len = strlen($buf)))
+            if (!($len = \strlen($buf)))
             {
                 break;
             }

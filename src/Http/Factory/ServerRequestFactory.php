@@ -41,7 +41,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         $method = static::getMethodFromEnvironment($server);
         $uri    = static::getUriFromEnvironmentWithHTTP($server);
 
-        $protocol = str_replace('HTTP/', '', $server['SERVER_PROTOCOL'] ?? '1.1');
+        $protocol = \str_replace('HTTP/', '', $server['SERVER_PROTOCOL'] ?? '1.1');
 
         $serverRequest = new ServerRequest($method, $uri, $headers, null, $protocol, $server);
 
@@ -54,7 +54,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
 
     public static function createServerRequestFromGlobals(): ServerRequestInterface
     {
-        $server = filter_input_array(INPUT_SERVER, FILTER_UNSAFE_RAW) ?: [];
+        $server = \filter_input_array(INPUT_SERVER, FILTER_UNSAFE_RAW) ?: [];
 
         if (false === isset($server['REQUEST_METHOD']))
         {
@@ -63,14 +63,14 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
 
         $headers = [];
 
-        if (function_exists('getallheaders'))
+        if (\function_exists('getallheaders'))
         {
-            $headers = getallheaders();
+            $headers = \getallheaders();
         }
 
-        $cookie = filter_input_array(INPUT_COOKIE, FILTER_UNSAFE_RAW) ?: [];
-        $query = filter_input_array(INPUT_GET, FILTER_UNSAFE_RAW) ?: [];
-        $data = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?: [];
+        $cookie = \filter_input_array(INPUT_COOKIE, FILTER_UNSAFE_RAW) ?: [];
+        $query = \filter_input_array(INPUT_GET, FILTER_UNSAFE_RAW) ?: [];
+        $data = \filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?: [];
 
         return static::createServerRequestFromArrays($server, $headers, $cookie, $query, $data, $_FILES);
     }
@@ -108,7 +108,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
             {
                 $normalized[$key] = $value;
             }
-            elseif (is_array($value))
+            elseif (\is_array($value))
             {
                 if (isset($value['tmp_name']))
                 {
@@ -129,7 +129,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
 
     private static function createUploadedFileFromSpec(array $value)
     {
-        if (is_array($value['tmp_name']))
+        if (\is_array($value['tmp_name']))
         {
             return self::normalizeNestedFileSpec($value);
         }
@@ -147,7 +147,7 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
     {
         $normalizedFiles = [];
 
-        foreach (array_keys($files['tmp_name']) as $key)
+        foreach (\array_keys($files['tmp_name']) as $key)
         {
             $spec                  = [
                 'tmp_name' => $files['tmp_name'][$key],

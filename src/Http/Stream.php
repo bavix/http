@@ -65,7 +65,7 @@ class Stream implements StreamInterface
      */
     public static function createFromResource($resource): Stream
     {
-        if (!is_resource($resource))
+        if (!\is_resource($resource))
         {
             throw new \InvalidArgumentException('Stream must be a resource');
         }
@@ -88,7 +88,7 @@ class Stream implements StreamInterface
      */
     public static function create(string $content): Stream
     {
-        $resource = fopen('php://temp', 'rwb+');
+        $resource = \fopen('php://temp', 'rwb+');
         $stream   = self::createFromResource($resource);
         $stream->write($content);
 
@@ -124,9 +124,9 @@ class Stream implements StreamInterface
     {
         if ($this->stream)
         {
-            if (is_resource($this->stream))
+            if (\is_resource($this->stream))
             {
-                fclose($this->stream);
+                \fclose($this->stream);
             }
 
             $this->detach();
@@ -162,10 +162,10 @@ class Stream implements StreamInterface
 
         if ($this->uri)
         {
-            clearstatcache(true, $this->uri);
+            \clearstatcache(true, $this->uri);
         }
 
-        $stats = fstat($this->stream);
+        $stats = \fstat($this->stream);
 
         if (isset($stats['size']))
         {
@@ -179,7 +179,7 @@ class Stream implements StreamInterface
 
     public function tell(): int
     {
-        $result = ftell($this->stream);
+        $result = \ftell($this->stream);
 
         if ($result === false)
         {
@@ -191,7 +191,7 @@ class Stream implements StreamInterface
 
     public function eof(): bool
     {
-        return !$this->stream || feof($this->stream);
+        return !$this->stream || \feof($this->stream);
     }
 
     public function isSeekable(): bool
@@ -206,7 +206,7 @@ class Stream implements StreamInterface
             throw new \RuntimeException('Stream is not seekable');
         }
 
-        if (fseek($this->stream, $offset, $whence) === -1)
+        if (\fseek($this->stream, $offset, $whence) === -1)
         {
             throw new \RuntimeException('Unable to seek to stream position ' . $offset . ' with whence ' . var_export($whence, true));
         }
@@ -230,7 +230,7 @@ class Stream implements StreamInterface
         }
 
         $this->size = null;
-        $result     = fwrite($this->stream, $string);
+        $result     = \fwrite($this->stream, $string);
 
         if ($result === false)
         {
@@ -262,7 +262,7 @@ class Stream implements StreamInterface
             throw new \RuntimeException('Unable to read stream contents');
         }
 
-        $contents = stream_get_contents($this->stream);
+        $contents = \stream_get_contents($this->stream);
 
         if ($contents === false)
         {
@@ -279,12 +279,7 @@ class Stream implements StreamInterface
             return $key ? null : [];
         }
 
-        if (null === $key)
-        {
-            return stream_get_meta_data($this->stream);
-        }
-
-        $meta = stream_get_meta_data($this->stream);
+        $meta = \stream_get_meta_data($this->stream);
 
         return $meta[$key] ?? null;
     }
