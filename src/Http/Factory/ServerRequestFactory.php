@@ -46,7 +46,6 @@ class ServerRequestFactory implements ServerRequestFactoryInterface
         $serverRequest = new ServerRequest($method, $uri, $headers, null, $protocol, $server);
 
         return $serverRequest
-            ->withCookieParams($cookie)
             ->withQueryParams($get)
             ->withParsedBody($post)
             ->withUploadedFiles(self::normalizeFiles($files));
